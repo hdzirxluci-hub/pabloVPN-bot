@@ -1,8 +1,9 @@
 from sqlalchemy import select
 from database.db import async_session
-from database.models import Setting
+from database.models import Setting, CustomButton
 
 _cache = {}
+_button_cache = {}
 
 async def get_setting(key: str, default: str = "") -> str:
     if key in _cache:
@@ -27,6 +28,7 @@ async def set_setting(key: str, value: str):
 
 def clear_cache():
     _cache.clear()
+    _button_cache.clear()
 
 async def get_brand() -> str:
     return await get_setting("brand_name", "PabloVPN")
@@ -39,6 +41,27 @@ async def format_text(key: str, default: str = "", **kwargs) -> str:
         return text.format(**kwargs)
     except (KeyError, IndexError):
         return text
+
+async def load_custom_buttons():
+    global _button_cache
+    try:
+        async with async_session() as session:
+            result = await session.execute(select(CustomButton))
+            buttons = result.scalars().all()
+            _button_cache = {b.button_key: b.custom_text for b in buttons}
+    except Exception:
+        _button_cache = {}
+
+async def set_button(key: str, text: str):
+    async with async_session() as session:
+        result = await session.execute(select(CustomButton).where(CustomButton.button_key == key))
+        btn = result.scalar_one_or_none()
+        if btn:
+            btn.custom_text = text
+        else:
+            session.add(CustomButton(button_key=key, custom_text=text))
+        await session.commit()
+        _button_cache[key] = text
 
 TEXTS = {
     "welcome_back": "👋 خوش آمدید!",
@@ -95,7 +118,7 @@ TEXTS = {
 }
 
 def t(key: str, **kwargs) -> str:
-    text = TEXTS.get(key, key)
+    text = _button_cache.get(key) or TEXTS.get(key, key)
     try:
         return text.format(**kwargs)
     except (KeyError, IndexError):

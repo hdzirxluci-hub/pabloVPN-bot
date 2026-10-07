@@ -32,7 +32,7 @@ class Panel(Base):
     __tablename__ = "panels"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
-    panel_type: Mapped[str] = mapped_column(String(50))  # marzban, 3xui, sanaei, pasargad
+    panel_type: Mapped[str] = mapped_column(String(50))
     url: Mapped[str] = mapped_column(String(500))
     username: Mapped[str] = mapped_column(String(100))
     password: Mapped[str] = mapped_column(String(255))
@@ -75,9 +75,9 @@ class Transaction(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     amount: Mapped[float] = mapped_column(Float)
-    type: Mapped[str] = mapped_column(String(50))  # deposit, purchase, refund, referral
-    method: Mapped[str] = mapped_column(String(50), nullable=True)  # card, crypto, zarinpal, wallet
-    status: Mapped[str] = mapped_column(String(50), default="pending")  # pending, approved, rejected
+    type: Mapped[str] = mapped_column(String(50))
+    method: Mapped[str] = mapped_column(String(50), nullable=True)
+    status: Mapped[str] = mapped_column(String(50), default="pending")
     receipt_file_id: Mapped[str] = mapped_column(String(255), nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     admin_id: Mapped[int] = mapped_column(BigInteger, nullable=True)
@@ -90,7 +90,7 @@ class Ticket(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     subject: Mapped[str] = mapped_column(String(255), nullable=True)
-    status: Mapped[str] = mapped_column(String(50), default="open")  # open, in_progress, closed
+    status: Mapped[str] = mapped_column(String(50), default="open")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     closed_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     messages: Mapped[list["TicketMessage"]] = relationship(back_populates="ticket", cascade="all, delete-orphan")
@@ -144,3 +144,10 @@ class ForcedChannel(Base):
     invite_link: Mapped[str] = mapped_column(String(500), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+class CustomButton(Base):
+    __tablename__ = "custom_buttons"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    button_key: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    custom_text: Mapped[str] = mapped_column(String(255))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

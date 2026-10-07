@@ -40,14 +40,27 @@ def confirm_inline_kb(yes_data: str, no_data: str = "cancel") -> InlineKeyboardM
     ])
 
 def owner_main_kb() -> ReplyKeyboardMarkup:
+    """منوی اصلی مالک - کامل و دسته‌بندی شده"""
     buttons = [
+        # ردیف ۱: آمار و مدیریت کاربران
         [KeyboardButton(text="📊 آمار ربات"), KeyboardButton(text="👥 مدیریت کاربران")],
+        # ردیف ۲: ادمین‌ها و پنل‌ها
         [KeyboardButton(text="🛡️ مدیریت ادمین‌ها"), KeyboardButton(text="🔌 مدیریت پنل‌ها")],
-        [KeyboardButton(text="📦 مدیریت پلن‌ها"), KeyboardButton(text="💳 تنظیمات پرداخت")],
-        [KeyboardButton(text="🎨 برندینگ و متن‌ها"), KeyboardButton(text="🔒 عضویت اجباری")],
-        [KeyboardButton(text="🎁 زیرمجموعه و تخفیف"), KeyboardButton(text="🧪 تست رایگان")],
-        [KeyboardButton(text="💬 مدیریت پشتیبانی"), KeyboardButton(text="📣 ارسال همگانی")],
-        [KeyboardButton(text="💾 بکاپ و ریستور"), KeyboardButton(text="⚙️ تنظیمات کلی")],
+        # ردیف ۳: پلن‌ها و تخفیف
+        [KeyboardButton(text="📦 مدیریت پلن‌ها"), KeyboardButton(text="🎁 زیرمجموعه و تخفیف")],
+        # ردیف ۴: پرداخت
+        [KeyboardButton(text="💳 تنظیمات پرداخت"), KeyboardButton(text="💵 روش‌های پرداخت")],
+        [KeyboardButton(text="💰 حداقل/حداکثر شارژ"), KeyboardButton(text="💹 درصد زیرمجموعه")],
+        # ردیف ۵: کانال‌ها
+        [KeyboardButton(text="📢 کانال رسید"), KeyboardButton(text="💬 گروه پشتیبانی")],
+        [KeyboardButton(text="🔒 عضویت اجباری"), KeyboardButton(text="💬 مدیریت پشتیبانی")],
+        # ردیف ۶: برندینگ
+        [KeyboardButton(text="🎨 برندینگ و متن‌ها"), KeyboardButton(text="🎨 نام دکمه‌ها")],
+        [KeyboardButton(text="📝 ویرایش متن خوش‌آمد"), KeyboardButton(text="📝 ویرایش درباره ما")],
+        [KeyboardButton(text="📝 ویرایش قوانین"), KeyboardButton(text="📝 ویرایش FAQ")],
+        [KeyboardButton(text="✍️ امضای پیام‌ها"), KeyboardButton(text="🧪 تست رایگان")],
+        # ردیف ۷: ارسال و بکاپ
+        [KeyboardButton(text="📣 ارسال همگانی"), KeyboardButton(text="💾 بکاپ و ریستور")],
         [KeyboardButton(text=t("back"))],
     ]
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
@@ -64,7 +77,7 @@ def admin_main_kb(permissions: list) -> ReplyKeyboardMarkup:
     }
     row = []
     for perm, btn in perm_buttons.items():
-        if perm in permissions:
+        if "all" in permissions or perm in permissions:
             row.append(btn)
             if len(row) == 2:
                 buttons.append(row)
@@ -104,7 +117,7 @@ def forced_join_kb(channels: list) -> InlineKeyboardMarkup:
 def plans_kb(plans: list) -> InlineKeyboardMarkup:
     buttons = []
     for plan in plans:
-        text = f"{plan.name} - {plan.price:,} تومان"
+        text = f"{plan.name} - {int(plan.price):,} تومان"
         buttons.append([InlineKeyboardButton(text=text, callback_data=f"plan:{plan.id}")])
     buttons.append([InlineKeyboardButton(text=t("back"), callback_data="back_main")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
